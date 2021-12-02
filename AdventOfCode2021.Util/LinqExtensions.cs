@@ -12,10 +12,10 @@ namespace AdventOfCode2021.Util
             return !collection.Any();
         }
 
-        public static int Sum(this IEnumerable<int> collection)
+        /*public static int Sum(this IEnumerable<int> collection)
         {
             return collection.Aggregate(0, (lhs, rhs) => lhs + rhs);
-        }
+        }*/
 
         /// <summary>
         /// Calculates a new collection from the first one. A window is used to sum up

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -28,6 +29,20 @@ namespace AdventOfCode2021.Util
             return File
                 .ReadLines(filepath)
                 .Select(x => x.Trim().Split().ToList())
+                .ToList();
+        }
+
+        /// <summary>
+        /// Reads all lines and then converts those lines with a custom function. 
+        /// </summary>
+        /// <param name="fpath"></param>
+        /// <param name="convert"></param>
+        /// <returns></returns>
+        public static List<T> ReadLinesAndConvert<T>(string fpath, Func<List<string>, T> convert)
+        {
+            var matrix = ReadMatrix(fpath);
+            return matrix
+                .Select(convert)
                 .ToList();
         }
         

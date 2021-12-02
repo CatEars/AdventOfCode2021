@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using AdventOfCode2021.Solutions.Day1;
 using AdventOfCode2021.Solutions.Day2;
 using AdventOfCode2021.Solutions.Day3;
@@ -9,18 +10,25 @@ namespace AdventOfCode2021
     class Program
     {
 
+        private static List<ISolvable> solutions = new()
+        {
+            new Day1Solver(),
+            new Day2Solver(),
+            new Day3Solver()
+        };
+
+        private static void SolveFor(int day)
+        {
+            var solver = solutions[day - 1];
+            var name = solver.GetType().FullName!.Split(".")[2];
+            Console.WriteLine("Solving for " + name);
+            solver.Run();
+        }
+        
         static void Main(string[] args)
         {
-            var solutions = new List<ISolvable>()
-            {
-                new Day1Solver(),
-                new Day2Solver(),
-                new Day3Solver()
-            };
-
-            var day = 1;
-            var solver = solutions[day - 1];
-            solver.Run();
+            var day = 2;
+            SolveFor(day);
         }
     }
 }
