@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using AdventOfCode2021.Solutions.Day1;
 using AdventOfCode2021.Solutions.Day2;
 using AdventOfCode2021.Solutions.Day3;
+using AdventOfCode2021.Solutions.Day4;
 using AdventOfCode2021.Solutions.Interface;
 
 namespace AdventOfCode2021
@@ -14,7 +15,8 @@ namespace AdventOfCode2021
         {
             new Day1Solver(),
             new Day2Solver(),
-            new Day3Solver()
+            new Day3Solver(),
+            new Day4Solver()
         };
 
         private static void SolveFor(int day)
@@ -27,7 +29,7 @@ namespace AdventOfCode2021
         
         static void Main(string[] args)
         {
-            var day = 2;
+            var day = 4;
             SolveFor(day);
         }
     }

@@ -10,7 +10,7 @@ namespace AdventOfCode2021.Solutions.Day1
     {
 
         private static string FileName => "Input/Day1_A.input";
-        
+
         public void Run()
         {
             SolveFirstStar();
@@ -23,7 +23,7 @@ namespace AdventOfCode2021.Solutions.Day1
             var numIncreases = MathUtil.NumIncreasingIndexes(values);
             Console.WriteLine("Solution (1): " + numIncreases);
         }
-                
+
         private static void SolveSecondStar()
         {
             var values = FileRead.ReadLinesAsInt(FileName);

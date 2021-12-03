@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace AdventOfCode2021.Util
@@ -19,7 +20,22 @@ namespace AdventOfCode2021.Util
                 return indices.Count(idx => intList[idx - 1] < intList[idx]);
             }
         }
-        
+
+        public static int BinaryToDecimal(string binaryString)
+        {
+            return Convert.ToInt32(binaryString, 2);
+        }
+
+        public static int BinaryInvert(int x, int bits)
+        {
+            var cnt = 0;
+            for (var bit = 0; bit < bits; ++bit)
+            {
+                cnt += (1 << bit) ^ ((1 << bit) & x);
+            }
+
+            return cnt;
+        }
     }
-    
+
 }

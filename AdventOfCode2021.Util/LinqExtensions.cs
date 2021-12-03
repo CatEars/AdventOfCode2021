@@ -12,10 +12,10 @@ namespace AdventOfCode2021.Util
             return !collection.Any();
         }
 
-        /*public static int Sum(this IEnumerable<int> collection)
+        public static string StringConcat<T>(this IEnumerable<T> collection)
         {
-            return collection.Aggregate(0, (lhs, rhs) => lhs + rhs);
-        }*/
+            return string.Join("", collection);
+        }
 
         /// <summary>
         /// Calculates a new collection from the first one. A window is used to sum up
@@ -49,6 +49,6 @@ namespace AdventOfCode2021.Util
 
             return result;
         }
-        
+
     }
 }
