@@ -24,32 +24,25 @@ namespace AdventOfCode2021.Solutions.Day4
         private (BingoNumbers, List<BingoBoard>) ReadInput(string filepath)
         {
             var lines = FileRead.ReadLines(filepath);
-            var numbers = lines[0];
-            var nums = numbers
-                .Split(",")
-                .Select(x => x.Trim())
-                .Where(x => !string.IsNullOrWhiteSpace(x))
-                .Select(int.Parse)
-                .ToList()
-                .Pipe(x => new BingoNumbers(x));
+            var numbers = StringUtil.IntoValidInts(lines[0], ",");
+            var bingoNumbers = new BingoNumbers(numbers);
 
             var boards = new List<BingoBoard>();
-            var idx = 2;
+            // Each board is 5 rows long and 5 columns wide. The text file separates them with an empty line.
+            var idx = 1;
             while (idx + 5 < lines.Count)
             {
+                idx++;
                 var marks = MatrixUtil.NewMatrix(5, 5, false);
                 var indexes = Enumerable.Range(idx, 5);
                 var board = indexes
-                    .Select(index => lines[index])
-                    .Select(line => StringUtil.IntoValidInts(line))
-                    .ToList()
-                    .Pipe(x => new BingoBoard(x, marks));
-
+                    .Select(index => StringUtil.IntoValidInts(lines[index]))
+                    .Pipe(board => new BingoBoard(board.ToList(), marks));
                 boards.Add(board);
-                idx += 6;
+                idx += 5;
             }
 
-            return (nums, boards);
+            return (bingoNumbers, boards);
         }
 
         private bool HasWon(BingoBoard board)
@@ -58,8 +51,8 @@ namespace AdventOfCode2021.Solutions.Day4
             var cols = Enumerable.Range(0, 5);
             var rows = Enumerable.Range(0, 5);
 
-            return cols.Any(col => Enumerable.Range(0, 5).All(row => marks[row][col])) ||
-                   rows.Any(row => Enumerable.Range(0, 5).All(col => marks[row][col]));
+            return cols.Any(col => marks.SelectCol(col).All(x => x)) ||
+                   rows.Any(row => marks.SelectRow(row).All(x => x));
         }
 
         private int SumUnmarked(BingoBoard board)

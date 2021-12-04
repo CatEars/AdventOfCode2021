@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace AdventOfCode2021.Util
 {
@@ -71,6 +72,16 @@ namespace AdventOfCode2021.Util
             var copy = NewMatrix<T>(matrix.Count, matrix[0].Count);
             copy.Apply((row, col) => matrix[row][col]);
             return copy;
+        }
+
+        public static IEnumerable<T> SelectCol<T>(this List<List<T>> matrix, int col)
+        {
+            return Enumerable.Range(0, matrix.Count).Select(row => matrix[row][col]);
+        }
+
+        public static IEnumerable<T> SelectRow<T>(this List<List<T>> matrix, int row)
+        {
+            return matrix[row];
         }
     }
 }
