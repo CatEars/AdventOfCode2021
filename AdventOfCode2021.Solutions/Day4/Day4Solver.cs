@@ -19,7 +19,7 @@ namespace AdventOfCode2021.Solutions.Day4
 
         private record BingoNumbers(List<int> Numbers);
 
-        private record BingoBoard(List<List<int>> Board);
+        private record BingoBoard(List<List<int>> Board, List<List<bool>> Marks);
 
         private (BingoNumbers, List<BingoBoard>) ReadInput(string filepath)
         {
@@ -34,41 +34,27 @@ namespace AdventOfCode2021.Solutions.Day4
                 .Pipe(x => new BingoNumbers(x));
 
             var boards = new List<BingoBoard>();
-            var idx = 1;
+            var idx = 2;
             while (idx + 5 < lines.Count)
             {
-                idx++; // skip empty line
+                var marks = MatrixUtil.NewMatrix(5, 5, false);
                 var indexes = Enumerable.Range(idx, 5);
                 var board = indexes
                     .Select(index => lines[index])
                     .Select(line => StringUtil.IntoValidInts(line))
                     .ToList()
-                    .Pipe(x => new BingoBoard(x));
+                    .Pipe(x => new BingoBoard(x, marks));
 
                 boards.Add(board);
-                idx += 5;
+                idx += 6;
             }
 
             return (nums, boards);
         }
 
-        private List<List<bool>> NewMarkingPlate()
+        private bool HasWon(BingoBoard board)
         {
-            var marks = new List<List<bool>>();
-            for (var row = 0; row < 5; ++row)
-            {
-                marks.Add(new List<bool>());
-                for (var col = 0; col < 5; ++col)
-                {
-                    marks[row].Add(false);
-                }
-            }
-
-            return marks;
-        }
-
-        private bool HasWon(List<List<bool>> marks)
-        {
+            var marks = board.Marks;
             var cols = Enumerable.Range(0, 5);
             var rows = Enumerable.Range(0, 5);
 
@@ -76,85 +62,58 @@ namespace AdventOfCode2021.Solutions.Day4
                    rows.Any(row => Enumerable.Range(0, 5).All(col => marks[row][col]));
         }
 
-        private int SumUnmarked(BingoBoard board, List<List<bool>> marks)
+        private int SumUnmarked(BingoBoard board)
         {
-            var rows = Enumerable.Range(0, 5);
-            return rows
-                .Select(row =>
-                    Enumerable.Range(0, 5)
-                        .Sum(col => marks[row][col] ? 0 : board.Board[row][col]))
+            return board.Board
+                .Map((row, col) => board.Marks[row][col] ? 0 : board.Board[row][col])
+                .SelectMany(row => row)
                 .Sum();
         }
 
-        private void Mark(BingoBoard board, List<List<bool>> marks, int calledNumber)
+        private void Mark(BingoBoard board, int calledNumber)
         {
-            for (var row = 0; row < 5; ++row)
-            for (var col = 0; col < 5; ++col)
-            {
-                if (board.Board[row][col] == calledNumber)
-                {
-                    marks[row][col] = true;
-                    return;
-                }
-            }
+            board.Marks.Apply((row, col) => board.Board[row][col] == calledNumber || board.Marks[row][col]);
         }
 
-        private int SolveFirst()
+        private (int Round, BingoBoard Board) Solve(BingoBoard board, BingoNumbers nums)
         {
-            var (nums, boards) = ReadInput(FileName);
-            var marks = boards.Select(_ => NewMarkingPlate()).ToList();
-            for (int idx = 0; idx < nums.Numbers.Count; idx++)
+            for (var round = 0; round < nums.Numbers.Count; ++round)
             {
-                var number = nums.Numbers[idx];
-                for (var boardIdx = 0; boardIdx < boards.Count; ++boardIdx)
+                Mark(board, nums.Numbers[round]);
+                if (HasWon(board))
                 {
-                    var board = boards[boardIdx];
-                    Mark(board, marks[boardIdx], number);
-                    if (HasWon(marks[boardIdx]))
-                    {
-                        return number * SumUnmarked(board, marks[boardIdx]);
-                    }
+                    return (round, board);
                 }
             }
 
-            throw new Exception("No winner??");
+            throw new Exception("All boards will eventually win");
         }
 
-        private int SolveSecond()
+        private List<(BingoBoard Board, int FinalNumber)> SolveBoards(List<BingoBoard> boards, BingoNumbers nums)
         {
-            var (nums, boards) = ReadInput(FileName);
-            var marks = boards.Select(_ => NewMarkingPlate()).ToList();
-            var hasWon = boards.Select(_ => false).ToList();
-            var lastScore = 0;
-
-            for (int idx = 0; idx < nums.Numbers.Count; idx++)
-            {
-                var number = nums.Numbers[idx];
-                for (var boardIdx = 0; boardIdx < boards.Count; ++boardIdx)
-                {
-                    if (hasWon[boardIdx]) continue;
-                    var board = boards[boardIdx];
-                    Mark(board, marks[boardIdx], number);
-                    if (HasWon(marks[boardIdx]))
-                    {
-                        hasWon[boardIdx] = true;
-                        lastScore = number * SumUnmarked(board, marks[boardIdx]);
-                    }
-                }
-            }
-
-            return lastScore;
+            var solutions = boards
+                .Select(board => Solve(board, nums))
+                .ToList();
+            solutions.Sort((x, y) => x.Round.CompareTo(y.Round));
+            return solutions
+                .Select(x => (x.Board, nums.Numbers[x.Round]))
+                .ToList();
         }
 
         private void SolveFirstStar()
         {
-            var sol = SolveFirst();
+            var (nums, boards) = ReadInput(FileName);
+            var solutions = SolveBoards(boards, nums);
+            var sol = SumUnmarked(solutions[0].Board) * solutions[0].FinalNumber;
             Console.WriteLine("Solution (1): " + sol);
         }
 
         private void SolveSecondStar()
         {
-            var sol = SolveSecond();
+            var (nums, boards) = ReadInput(FileName);
+            var solutions = SolveBoards(boards, nums);
+            var last = solutions.Count - 1;
+            var sol = SumUnmarked(solutions[last].Board) * solutions[last].FinalNumber;
             Console.WriteLine("Solution (2): " + sol);
         }
 
