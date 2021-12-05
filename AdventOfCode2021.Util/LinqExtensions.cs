@@ -12,6 +12,25 @@ namespace AdventOfCode2021.Util
             return !collection.Any();
         }
 
+        public static (List<T> Passing, List<T> Failing) Partition<T>(this IEnumerable<T> collection, Predicate<T> pred)
+        {
+            var passing = new List<T>();
+            var failing = new List<T>();
+            foreach (var item in collection)
+            {
+                if (pred(item))
+                {
+                    passing.Add(item);
+                }
+                else
+                {
+                    failing.Add(item);
+                }
+            }
+
+            return (passing, failing);
+        }
+
         public static string StringConcat<T>(this IEnumerable<T> collection)
         {
             return string.Join("", collection);
