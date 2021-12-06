@@ -60,5 +60,14 @@ namespace AdventOfCode2021.Util
                 .Select(x => x.Trim())
                 .ToList();
         }
+
+        public static List<int> ReadCommaList(string fileName)
+        {
+            return File.ReadAllText(fileName)
+                .Split(",")
+                .Where(x => int.TryParse(x, out var _))
+                .Select(int.Parse)
+                .ToList();
+        }
     }
 }
