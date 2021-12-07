@@ -50,6 +50,21 @@ namespace AdventOfCode2021.Util
             for (int idx = 1; idx < vals.Length; ++idx) first = Math.Max(first, vals[idx]);
             return first;
         }
+
+        public static int Min(List<int> vals)
+        {
+            var first = vals[0];
+            for (int idx = 1; idx < vals.Count; ++idx) first = Math.Min(first, vals[idx]);
+            return first;
+        }
+
+        public static int Max(List<int> vals)
+        {
+            var first = vals[0];
+            for (int idx = 1; idx < vals.Count; ++idx) first = Math.Max(first, vals[idx]);
+            return first;
+        }
+
     }
 
 }

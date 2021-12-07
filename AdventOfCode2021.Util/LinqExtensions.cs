@@ -68,6 +68,5 @@ namespace AdventOfCode2021.Util
 
             return result;
         }
-
     }
 }
