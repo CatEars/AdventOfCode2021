@@ -29,9 +29,9 @@ namespace AdventOfCode2021.Solutions.Day3
             var gamma = numOnesPerColumn
                 .Select(numOnes => numOnes >= half ? 1 : 0)
                 .StringConcat()
-                .Pipe(MathUtil.BinaryToDecimal);
+                .Pipe(BinaryUtil.BinaryToDecimal);
 
-            var epsilon = MathUtil.BinaryInvert(gamma, matrix[0].Length);
+            var epsilon = BinaryUtil.BinaryInvert(gamma, matrix[0].Length);
             Console.WriteLine("Solution (1): " + gamma * epsilon);
         }
 
@@ -58,7 +58,7 @@ namespace AdventOfCode2021.Solutions.Day3
                 col++;
             }
 
-            return MathUtil.BinaryToDecimal(keptRows[0].StringConcat());
+            return BinaryUtil.BinaryToDecimal(keptRows[0].StringConcat());
         }
     }
 }

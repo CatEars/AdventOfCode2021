@@ -21,22 +21,6 @@ namespace AdventOfCode2021.Util
             }
         }
 
-        public static int BinaryToDecimal(string binaryString)
-        {
-            return Convert.ToInt32(binaryString, 2);
-        }
-
-        public static int BinaryInvert(int x, int bits)
-        {
-            var cnt = 0;
-            for (var bit = 0; bit < bits; ++bit)
-            {
-                cnt += (1 << bit) ^ ((1 << bit) & x);
-            }
-
-            return cnt;
-        }
-
         public static int Min(params int[] vals)
         {
             var first = vals[0];

@@ -19,5 +19,12 @@ namespace AdventOfCode2021.Solutions.Day9
             var sol = 0;
             Console.WriteLine("Solution (1): " + sol);
         }
+
+        private void SolveSecondStar()
+        {
+            var sol = 0;
+            Console.WriteLine("Solution (2): " + sol);
+        }
+
     }
 }
