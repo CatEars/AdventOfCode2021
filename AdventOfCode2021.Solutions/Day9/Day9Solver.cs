@@ -24,9 +24,7 @@ namespace AdventOfCode2021.Solutions.Day9
 
             var lowPoints = FindLowPoints(matrix);
             var sol = lowPoints
-                .Flatten()
-                .Where(x => x != -1)
-                .Select(x => x + 1) // Risk level is level of low points + 1
+                .Select(pos => matrix[pos.Row][pos.Col] + 1) // Risk level is level of low points + 1
                 .Sum();
             Console.WriteLine("Solution (1): " + sol);
         }
@@ -38,27 +36,20 @@ namespace AdventOfCode2021.Solutions.Day9
 
             var lowPoints = FindLowPoints(matrix);
             var basins = lowPoints
-                .Map((row, col, level) => level == -1 ? -1 : CalculateBasinSize(matrix, row, col))
-                .Flatten()
-                .Where(x => x != -1)
+                .Select(pos => CalculateBasinSize(matrix, pos.Row, pos.Col))
                 .ToList();
-            basins.Sort();
-            var end = basins.Count - 1;
-            Console.WriteLine("Solution (2): " + basins[end] * basins[end - 1] * basins[end - 2]);
+            basins.SortDescending();
+            Console.WriteLine("Solution (2): " + basins[0] * basins[1] * basins[2]);
         }
 
-        private static List<List<int>> FindLowPoints(List<List<int>> matrix)
+        private static IEnumerable<(int Row, int Col)> FindLowPoints(List<List<int>> heightMap)
         {
-            var lowPoints = matrix
-                .Map((row, col, level) =>
-                {
-                    return matrix
+            return heightMap
+                .WhereCells((row, col) =>
+                    heightMap
                         .EachAdjacent(row, col)
-                        .Any(pos => matrix[pos.Row][pos.Col] <= level)
-                        ? -1
-                        : level;
-                });
-            return lowPoints;
+                        .All(adjacentPos => heightMap[row][col] < heightMap[adjacentPos.Row][adjacentPos.Col])
+                );
         }
 
         private int CalculateBasinSize(List<List<int>> matrix, int row, int col)
@@ -72,8 +63,7 @@ namespace AdventOfCode2021.Solutions.Day9
                 var newPositions = matrix
                     .EachAdjacent(r, c)
                     .Where(pos => !found[pos.Row][pos.Col] && matrix[pos.Row][pos.Col] < 9)
-                    .SideEffect(pos => found[pos.Row][pos.Col] = true)
-                    .ToList();
+                    .SideEffect(pos => found[pos.Row][pos.Col] = true);
                 queue.AddRange(newPositions);
             }
 

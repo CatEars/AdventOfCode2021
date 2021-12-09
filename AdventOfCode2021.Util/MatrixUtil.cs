@@ -107,5 +107,13 @@ namespace AdventOfCode2021.Util
         {
             return matrix.SelectMany(x => x);
         }
+
+        public static IEnumerable<(int Row, int Col)> WhereCells<T>(this List<List<T>> matrix, Func<int, int, bool> predicate)
+        {
+            return matrix
+                .Map((row, col) => predicate(row, col) ? (row, col) : (-1, -1))
+                .Flatten()
+                .Where(pos => pos.Item1 != -1);
+        }
     }
 }
