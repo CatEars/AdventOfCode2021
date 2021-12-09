@@ -43,9 +43,9 @@ namespace AdventOfCode2021.Util
             matrix.Apply((row, col, _) => func(row, col));
         }
 
-        public static List<List<T>> Map<T>(this List<List<T>> matrix, Func<int, int, T, T> func)
+        public static List<List<T2>> Map<T, T2>(this List<List<T>> matrix, Func<int, int, T, T2> func)
         {
-            var copy = Copy(matrix);
+            var copy = NewMatrix<T2>(matrix.Count, matrix[0].Count);
             for (var row = 0; row < matrix.Count; ++row)
             {
                 for (var col = 0; col < matrix[row].Count; ++col)
@@ -57,12 +57,12 @@ namespace AdventOfCode2021.Util
             return copy;
         }
 
-        public static List<List<T>> Map<T>(this List<List<T>> matrix, Func<T, T> func)
+        public static List<List<T2>> Map<T, T2>(this List<List<T>> matrix, Func<T, T2> func)
         {
             return matrix.Map((_, _, x) => func(x));
         }
 
-        public static List<List<T>> Map<T>(this List<List<T>> matrix, Func<int, int, T> func)
+        public static List<List<T2>> Map<T, T2>(this List<List<T>> matrix, Func<int, int, T2> func)
         {
             return matrix.Map((row, col, _) => func(row, col));
         }
@@ -82,6 +82,25 @@ namespace AdventOfCode2021.Util
         public static IEnumerable<T> SelectRow<T>(this List<List<T>> matrix, int row)
         {
             return matrix[row];
+        }
+
+        public static IEnumerable<(int Row, int Col)> EachAdjacent<T>(this List<List<T>> matrix, int row, int col)
+        {
+            var diffRow = new List<int>() { -1, 0, 1, 0 };
+            var diffCol = new List<int>() { 0, -1, 0, 1 };
+            var adjacents = new List<(int, int)>();
+            for (var diffIdx = 0; diffIdx < 4; ++diffIdx)
+            {
+                var nr = row + diffRow[diffIdx];
+                var nc = col + diffCol[diffIdx];
+                if (0 <= nr && nr < matrix.Count &&
+                    0 <= nc && nc < matrix[nr].Count)
+                {
+                    adjacents.Add((nr, nc));
+                }
+            }
+
+            return adjacents;
         }
     }
 }
