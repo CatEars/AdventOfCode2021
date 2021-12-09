@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 
 namespace AdventOfCode2021.Util
 {
@@ -23,5 +24,7 @@ namespace AdventOfCode2021.Util
             };
         }
 
+        public static Func<T, T> MultiApply<T>(Func<T, T> func, int n) =>
+            obj => Enumerable.Range(0, n).Aggregate(obj, (o, _) => func(o));
     }
 }

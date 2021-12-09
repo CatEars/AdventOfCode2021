@@ -19,7 +19,7 @@ namespace AdventOfCode2021.Solutions.Day6
 
         private record Counter(Dictionary<int, long> Fish);
 
-        private Counter Age(Counter current)
+        private static Counter Age(Counter current)
         {
             var next = new Counter(new Dictionary<int, long>());
             var births = current.Fish.GetOrZero(0);
@@ -43,8 +43,8 @@ namespace AdventOfCode2021.Solutions.Day6
                 start.Fish.AddOrSet(day, 1);
             }
 
-            var solution = Enumerable.Range(0, numDays)
-                .Aggregate(start, (counter, _) => Age(counter));
+            var ageSeveralDays = FunctionalUtils.MultiApply<Counter>(Age, numDays);
+            var solution = ageSeveralDays(start);
 
             return solution.Fish.Values.Sum();
         }

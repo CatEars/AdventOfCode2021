@@ -11,13 +11,18 @@ namespace AdventOfCode2021.Solutions.Day10
         public void Run()
         {
             SolveFirstStar();
-            //SolveSecondStar();
+            SolveSecondStar();
         }
 
         private void SolveFirstStar()
         {
             var sol = 0;
             Console.WriteLine("Solution (1): " + sol);
+        }
+
+        private void SolveSecondStar()
+        {
+
         }
     }
 }
