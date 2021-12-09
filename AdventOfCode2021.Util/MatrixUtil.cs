@@ -102,5 +102,10 @@ namespace AdventOfCode2021.Util
 
             return adjacents;
         }
+
+        public static IEnumerable<T> Flatten<T>(this List<List<T>> matrix)
+        {
+            return matrix.SelectMany(x => x);
+        }
     }
 }

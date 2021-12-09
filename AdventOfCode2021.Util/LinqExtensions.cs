@@ -68,5 +68,17 @@ namespace AdventOfCode2021.Util
 
             return result;
         }
+
+        public static IEnumerable<T> SideEffect<T>(this IEnumerable<T> collection, Action<T> action)
+        {
+            var ret = new List<T>();
+            foreach (var item in collection)
+            {
+                action(item);
+                ret.Add(item);
+            }
+
+            return ret;
+        }
     }
 }

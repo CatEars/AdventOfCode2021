@@ -24,7 +24,7 @@ namespace AdventOfCode2021.Solutions.Day9
 
             var lowPoints = FindLowPoints(matrix);
             var sol = lowPoints
-                .SelectMany(x => x)
+                .Flatten()
                 .Where(x => x != -1)
                 .Select(x => x + 1) // Risk level is level of low points + 1
                 .Sum();
@@ -39,7 +39,7 @@ namespace AdventOfCode2021.Solutions.Day9
             var lowPoints = FindLowPoints(matrix);
             var basins = lowPoints
                 .Map((row, col, level) => level == -1 ? -1 : CalculateBasinSize(matrix, row, col))
-                .SelectMany(x => x)
+                .Flatten()
                 .Where(x => x != -1)
                 .ToList();
             basins.Sort();
@@ -69,16 +69,12 @@ namespace AdventOfCode2021.Solutions.Day9
             for (var idx = 0; idx < queue.Count; ++idx)
             {
                 var (r, c) = queue[idx];
-                matrix
+                var newPositions = matrix
                     .EachAdjacent(r, c)
                     .Where(pos => !found[pos.Row][pos.Col] && matrix[pos.Row][pos.Col] < 9)
-                    .ToList()
-                    .ForEach(pos =>
-                    {
-                        var (nr, nc) = pos;
-                        found[nr][nc] = true;
-                        queue.Add((nr, nc));
-                    });
+                    .SideEffect(pos => found[pos.Row][pos.Col] = true)
+                    .ToList();
+                queue.AddRange(newPositions);
             }
 
             return queue.Count;
