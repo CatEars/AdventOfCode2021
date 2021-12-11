@@ -89,7 +89,7 @@ namespace AdventOfCode2021.Util
             var diffRow = new List<int>() { -1, 0, 1, 0 };
             var diffCol = new List<int>() { 0, -1, 0, 1 };
             var adjacents = new List<(int, int)>();
-            for (var diffIdx = 0; diffIdx < 4; ++diffIdx)
+            for (var diffIdx = 0; diffIdx < diffRow.Count; ++diffIdx)
             {
                 var nr = row + diffRow[diffIdx];
                 var nc = col + diffCol[diffIdx];
@@ -103,6 +103,27 @@ namespace AdventOfCode2021.Util
             return adjacents;
         }
 
+        public static IEnumerable<(int Row, int Col)> EachAdjacentAndDiagonal<T>(this List<List<T>> matrix, int row,
+            int col)
+        {
+            var diffRow = new List<int>() { -1, 0, 1, 0, 1, 1, -1, -1 };
+            var diffCol = new List<int>() { 0, -1, 0, 1, 1, -1, 1, -1 };
+            var adjacents = new List<(int, int)>();
+            for (var diffIdx = 0; diffIdx < diffRow.Count; ++diffIdx)
+            {
+                var nr = row + diffRow[diffIdx];
+                var nc = col + diffCol[diffIdx];
+                if (0 <= nr && nr < matrix.Count &&
+                    0 <= nc && nc < matrix[nr].Count)
+                {
+                    adjacents.Add((nr, nc));
+                }
+            }
+
+            return adjacents;
+        }
+
+
         public static IEnumerable<T> Flatten<T>(this List<List<T>> matrix)
         {
             return matrix.SelectMany(x => x);
@@ -114,6 +135,11 @@ namespace AdventOfCode2021.Util
                 .Map((row, col) => predicate(row, col) ? (row, col) : (-1, -1))
                 .Flatten()
                 .Where(pos => pos.Item1 != -1);
+        }
+
+        public static int Size<T>(this List<List<T>> matrix)
+        {
+            return matrix.Count * matrix[0].Count;
         }
     }
 }
