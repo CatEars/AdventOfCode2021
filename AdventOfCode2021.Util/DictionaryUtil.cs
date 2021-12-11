@@ -39,5 +39,15 @@ namespace AdventOfCode2021.Util
             return collection.ContainsKey(key) ? collection[key] : 0L;
         }
 
+        public static Dictionary<T2, T> Reverse<T, T2>(this Dictionary<T, T2> collection)
+        {
+            var result = new Dictionary<T2, T>();
+            foreach (var (key, value) in collection)
+            {
+                result[value] = key;
+            }
+            return result;
+        }
+
     }
 }

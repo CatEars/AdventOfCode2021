@@ -12,110 +12,28 @@ namespace AdventOfCode2021.Solutions.Day10
 
         private static string FileName => "Input/Day10_A.input";
 
+        private static Dictionary<char, char> EndToStart { get; } = new()
+        {
+            {')', '('},
+            {']', '['},
+            {'}', '{'},
+            {'>', '<'},
+        };
+
+        private static Dictionary<char, char> StartToEnd { get; } = EndToStart.Reverse();
+
+        private static Dictionary<string, int> SyntaxScoring { get; } = new()
+        {
+            { ")", 3 },
+            { "]", 57 },
+            { "}", 1197 },
+            { ">", 25137 }
+        };
+
         public void Run()
         {
             SolveFirstStar();
             SolveSecondStar();
-        }
-
-        private string FindFirstCorruptOrNull(string line)
-        {
-            var stack = new Stack<char>();
-            var ender = new HashSet<char>() { ')', ']', '}', '>' };
-            var match = new Dictionary<char, char>()
-            {
-                {')', '('},
-                {']', '['},
-                {'}', '{'},
-                {'>', '<'},
-            };
-            foreach (var character in line)
-            {
-                if (!ender.Contains(character))
-                {
-                    stack.Push(character);
-                }
-                else if (stack.Empty() && ender.Contains(character))
-                {
-                    return character.ToString();
-                }
-                else if (!stack.Empty() && match.ContainsKey(character) && stack.Peek() == match[character])
-                {
-                    stack.Pop();
-                }
-                else if (!stack.Empty() && match.ContainsKey(character) && stack.Peek() != match[character])
-                {
-                    return character.ToString();
-                }
-            }
-
-            return null;
-        }
-
-        private string FindCompletion(string line)
-        {
-            var stack = new Stack<char>();
-            var ender = new HashSet<char>() { ')', ']', '}', '>' };
-            var match = new Dictionary<char, char>()
-            {
-                {')', '('},
-                {']', '['},
-                {'}', '{'},
-                {'>', '<'},
-            };
-            foreach (var character in line)
-            {
-                if (!ender.Contains(character))
-                {
-                    stack.Push(character);
-                }
-                else if (!stack.Empty() && match.ContainsKey(character) && stack.Peek() == match[character])
-                {
-                    stack.Pop();
-                }
-                else
-                {
-                    throw new Exception("Wrong assumptions for " + line);
-                }
-            }
-
-            var oppositeMatch = new Dictionary<char, char>()
-            {
-                { '(', ')' },
-                { '[', ']' },
-                { '{', '}' },
-                { '<', '>' },
-            };
-            var builder = new StringBuilder();
-            while (stack.Any())
-            {
-                var curr = stack.Pop();
-                builder.Append(oppositeMatch[curr]);
-            }
-
-            return builder.ToString();
-        }
-
-        private int ToHighScore(string arg)
-        {
-            if (arg == ")")
-            {
-                return 3;
-            }
-            else if (arg == "]")
-            {
-                return 57;
-            }
-            else if (arg == "}")
-            {
-                return 1197;
-            }
-            else if (arg == ">")
-            {
-                return 25137;
-            }
-
-            throw new Exception($"bad character: {arg}");
         }
 
         private void SolveFirstStar()
@@ -124,28 +42,9 @@ namespace AdventOfCode2021.Solutions.Day10
             var solution = lines
                 .Select(FindFirstCorruptOrNull)
                 .Where(character => character != null)
-                .Select(ToHighScore)
+                .Select(character => SyntaxScoring[character])
                 .Sum();
             Console.WriteLine("Solution (1): " + solution);
-        }
-
-        private long ScoreLine(string line)
-        {
-            var points = new Dictionary<char, long>()
-            {
-                { ')', 1 },
-                { ']', 2 },
-                { '}', 3 },
-                { '>', 4 }
-            };
-            var sum = 0L;
-            foreach (var c in line)
-            {
-                sum *= 5L;
-                sum += points[c];
-            }
-
-            return sum;
         }
 
         private void SolveSecondStar()
@@ -153,12 +52,83 @@ namespace AdventOfCode2021.Solutions.Day10
             var lines = FileRead.ReadLines(FileName);
             var scores = lines
                 .Where(line => FindFirstCorruptOrNull(line) == null)
-                .Select(FindCompletion)
-                .Select(ScoreLine)
+                .Select(FindLineCompletion)
+                .Select(ScoreLineCompletion)
                 .ToList();
             scores.Sort();
             var solution = scores[scores.Count / 2];
             Console.WriteLine("Solution (2): " + solution);
         }
+
+
+        private string FindFirstCorruptOrNull(string line)
+        {
+            var stack = new Stack<char>();
+            foreach (var character in line)
+            {
+                if (StartToEnd.ContainsKey(character))
+                {
+                    stack.Push(character);
+                    continue;
+                }
+                // assume character is ending character
+
+                if (stack.Empty())
+                {
+                    return character.ToString();
+                }
+
+                if (stack.Peek() == EndToStart[character])
+                {
+                    stack.Pop();
+                }
+                else if (stack.Peek() != EndToStart[character])
+                {
+                    return character.ToString();
+                }
+            }
+
+            return null;
+        }
+
+        private string FindLineCompletion(string line)
+        {
+            var stack = new Stack<char>();
+            foreach (var character in line)
+            {
+                if (StartToEnd.ContainsKey(character))
+                {
+                    stack.Push(character);
+                }
+                else
+                {
+                    // assume character is ending key
+                    stack.Pop();
+                }
+            }
+
+            var builder = new StringBuilder();
+            while (stack.Any())
+            {
+                var curr = stack.Pop();
+                builder.Append(StartToEnd[curr]);
+            }
+
+            return builder.ToString();
+        }
+
+        private long ScoreLineCompletion(string line)
+        {
+            var points = new List<char>() { ')', ']', '}', '>' };
+            var sum = 0L;
+            foreach (var c in line)
+            {
+                sum *= 5L;
+                sum += points.IndexOf(c) + 1;
+            }
+
+            return sum;
+        }
+
     }
 }
