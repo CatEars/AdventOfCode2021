@@ -29,6 +29,18 @@ namespace AdventOfCode2021.Util
             }
         }
 
+        public static void Append<T, T2>(this Dictionary<T, List<T2>> collection, T key, T2 value)
+        {
+            if (collection.ContainsKey(key))
+            {
+                collection[key].Add(value);
+            }
+            else
+            {
+                collection[key] = new List<T2>() { value };
+            }
+        }
+
         public static int GetOrZero<T>(this Dictionary<T, int> collection, T key)
         {
             return collection.ContainsKey(key) ? collection[key] : 0;

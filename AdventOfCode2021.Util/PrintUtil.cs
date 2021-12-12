@@ -20,5 +20,13 @@ namespace AdventOfCode2021.Util
             }
         }
 
+        public static void PrintIndent(int size)
+        {
+            for (int idx = 0; idx < size; ++idx)
+            {
+                Console.Write("  ");
+            }
+        }
+
     }
 }
