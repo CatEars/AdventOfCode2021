@@ -37,6 +37,19 @@ namespace AdventOfCode2021
             new Day13Solver(),
         };
 
+        private static void TimeAll()
+        {
+            var start = DateTime.UtcNow;
+            foreach (var sol in solutions)
+            {
+                sol.Run();
+                Console.WriteLine(" ========= ");
+            }
+            var end = DateTime.UtcNow;
+            var diff = end - start;
+            Console.WriteLine($"Total time for {solutions.Count} solutions was {diff}");
+        }
+
         private static void SolveFor(int day)
         {
             var solver = solutions[day - 1];
@@ -47,8 +60,10 @@ namespace AdventOfCode2021
 
         static void Main(string[] args)
         {
+
             var day = 13;
             SolveFor(day);
+            //TimeAll();
         }
     }
 }

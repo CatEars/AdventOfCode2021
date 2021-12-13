@@ -141,5 +141,35 @@ namespace AdventOfCode2021.Util
         {
             return matrix.Count * matrix[0].Count;
         }
+
+        public static List<List<T>> Portion<T>(this List<List<T>> matrix, int numRows, int numCols)
+        {
+            return NewMatrix<T>(numRows, numCols)
+                .Map((row, col) => matrix[row][col]);
+        }
+
+        public static IEnumerable<(int Row, int Col)> Enumerate<T>(this List<List<T>> matrix)
+        {
+            List<(int Row, int Col)> list = new();
+            for (var row = 0; row < matrix.Count; ++row)
+            {
+                for (var col = 0; col < matrix[0].Count; ++col)
+                {
+                    list.Add((row, col));
+                }
+            }
+
+            return list;
+        }
+
+        public static int NumRows<T>(this List<List<T>> matrix)
+        {
+            return matrix.Count;
+        }
+
+        public static int NumCols<T>(this List<List<T>> matrix)
+        {
+            return matrix[0].Count;
+        }
     }
 }
