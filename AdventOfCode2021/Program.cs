@@ -47,7 +47,7 @@ namespace AdventOfCode2021
 
         static void Main(string[] args)
         {
-            var day = 12;
+            var day = 13;
             SolveFor(day);
         }
     }
