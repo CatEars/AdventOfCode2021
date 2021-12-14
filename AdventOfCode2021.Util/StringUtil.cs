@@ -14,5 +14,16 @@ namespace AdventOfCode2021.Util
                 .ToList();
         }
 
+        public static Dictionary<char, int> CharCount(string s)
+        {
+            var result = new Dictionary<char, int>();
+            foreach (var c in s)
+            {
+                result.AddOrSet(c, 1);
+            }
+
+            return result;
+        }
+
     }
 }
