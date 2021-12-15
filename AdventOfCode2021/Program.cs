@@ -66,8 +66,7 @@ namespace AdventOfCode2021
 
         static void Main(string[] args)
         {
-
-            var day = 14;
+            var day = 15;
             SolveFor(day);
             //TimeAll();
         }

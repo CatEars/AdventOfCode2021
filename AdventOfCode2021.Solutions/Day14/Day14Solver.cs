@@ -51,19 +51,43 @@ namespace AdventOfCode2021.Solutions.Day14
             var transforms = lines
                 .Skip(2)
                 .Select(x => x.Trim().Split(" -> "))
-                .Select(x => new Transform(x[0][0], x[0][1], x[1][0]))
-                .ToList();
-            var resultingPolymer = Enumerable
-                .Range(0, 10)
-                .Aggregate(polymer, (p, _) => Age(p, transforms));
-            var count = StringUtil.CharCount(resultingPolymer)
-                .Values
-                .ToArray();
+                .ToDictionary(key => key[0], val => val[1]);
+            var start = new Dictionary<string, long>();
+            for (int idx = 0; idx < polymer.Length - 1; ++idx)
+            {
+                var s = polymer[idx].ToString() + polymer[idx + 1];
+                start.AddOrSet(s, 1);
+            }
 
-            var maximum = MathUtil.Max(count);
-            var minimum = MathUtil.Min(count);
+            var result = Enumerable
+                .Range(0, 10)
+                .Aggregate(start, (s, _) => Age(s, transforms))
+                .ToList();
+            var charCount = new Dictionary<char, long>();
+            foreach (var pair in result)
+            {
+                charCount.AddOrSet(pair.Key[0], pair.Value);
+                charCount.AddOrSet(pair.Key[1], pair.Value);
+            }
+
+            foreach (var key in charCount.Keys)
+            {
+                var pre = (charCount[key] & 1) > 0;
+                charCount[key] /= 2;
+                if (pre && key == polymer.First())
+                {
+                    charCount[key] += 1;
+                }
+                else if (pre && key == polymer.Last())
+                {
+                    charCount[key] += 1;
+                }
+            }
+            var count = charCount.Values.ToList();
+            count.Sort();
+            var minimum = count.First();
+            var maximum = count.Last();
             var sol = maximum - minimum;
-            Console.WriteLine(maximum + ", " + minimum);
             Console.WriteLine("Solution (1): " + sol);
         }
 
@@ -130,7 +154,6 @@ namespace AdventOfCode2021.Solutions.Day14
             var minimum = count.First();
             var maximum = count.Last();
             var sol = maximum - minimum;
-            Console.WriteLine(minimum + ", " + maximum);
             Console.WriteLine("Solution (2): " + sol);
         }
     }

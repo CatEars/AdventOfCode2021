@@ -8,4 +8,8 @@
       <ProjectReference Include="..\AdventOfCode2021.Util\AdventOfCode2021.Util.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="OptimizedPriorityQueue" Version="5.1.0" />
+    </ItemGroup>
+
 </Project>
