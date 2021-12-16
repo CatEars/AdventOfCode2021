@@ -36,12 +36,12 @@ namespace AdventOfCode2021.Solutions.Day15
             var startRow = matrix.NumRows() - 1;
             var startCol = matrix.NumCols() - 1;
             dist[startRow][startCol] = matrix[startRow][startCol];
-            var queue = new SimplePriorityQueue<(int Priority, int Row, int Col)>();
-            queue.Enqueue((0, startRow, startCol), 0);
+            var queue = new SimplePriorityQueue<(int Row, int Col)>();
+            queue.Enqueue((startRow, startCol), 0);
             while (queue.Any())
             {
                 var element = queue.Dequeue();
-                var (prio, row, col) = element;
+                var (row, col) = element;
                 if (visited[row][col]) continue;
                 var now = dist[row][col];
                 foreach (var (nextRow, nextCol) in matrix.EachAdjacent(row, col))
@@ -53,7 +53,7 @@ namespace AdventOfCode2021.Solutions.Day15
                         if (dist[nextRow][nextCol] > nextDist)
                         {
                             dist[nextRow][nextCol] = nextDist;
-                            queue.Enqueue((nextDist, nextRow, nextCol), nextDist);
+                            queue.Enqueue((nextRow, nextCol), nextDist);
                         }
                     }
                 }
@@ -75,17 +75,8 @@ namespace AdventOfCode2021.Solutions.Day15
                     var added = row + col;
                     var extraRow = row * matrix.NumRows();
                     var extraCol = col * matrix.NumCols();
-                    foreach (var (innerRow, innerCol) in matrix.Enumerate())
-                    {
-                        var resultingRow = extraRow + innerRow;
-                        var resultingCol = extraCol + innerCol;
-                        var value = matrix[innerRow][innerCol] + added;
-                        if (value > 9)
-                        {
-                            value -= 9;
-                        }
-                        realMatrix[resultingRow][resultingCol] = value;
-                    }
+                    var updatedProjection = matrix.Map(element => ((element - 1 + added) % 9) + 1);
+                    updatedProjection.ProjectOnto(realMatrix, extraRow, extraCol);
                 }
             }
             realMatrix[0][0] = 0;

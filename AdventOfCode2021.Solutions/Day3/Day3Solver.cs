@@ -26,7 +26,7 @@ namespace AdventOfCode2021.Solutions.Day3
                 .Range(0, matrix[0].Length)
                 .Select(col => matrix.Count(line => line[col] == '1'));
 
-            var gamma = numOnesPerColumn
+            var gamma = (int) numOnesPerColumn
                 .Select(numOnes => numOnes >= half ? 1 : 0)
                 .StringConcat()
                 .Pipe(BinaryUtil.BinaryToDecimal);
@@ -58,7 +58,7 @@ namespace AdventOfCode2021.Solutions.Day3
                 col++;
             }
 
-            return BinaryUtil.BinaryToDecimal(keptRows[0].StringConcat());
+            return (int) BinaryUtil.BinaryToDecimal(keptRows[0].StringConcat());
         }
     }
 }

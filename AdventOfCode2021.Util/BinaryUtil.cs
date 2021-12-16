@@ -16,9 +16,9 @@ namespace AdventOfCode2021.Util
             return bits;
         }
 
-        public static int BinaryToDecimal(string binaryString)
+        public static long BinaryToDecimal(string binaryString)
         {
-            return Convert.ToInt32(binaryString, 2);
+            return Convert.ToInt64(binaryString, 2);
         }
 
         public static int BinaryInvert(int x, int bits)

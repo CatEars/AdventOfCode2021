@@ -171,5 +171,18 @@ namespace AdventOfCode2021.Util
         {
             return matrix[0].Count;
         }
+
+        public static void ProjectOnto<T>(this List<List<T>> source, List<List<T>> matrix, int upperLeftRow, int upperLeftCol)
+        {
+            for (var row = 0; row < source.NumRows(); ++row)
+            {
+                for (var col = 0; col < source.NumCols(); ++col)
+                {
+                    var targetRow = upperLeftRow + row;
+                    var targetCol = upperLeftCol + col;
+                    matrix[targetRow][targetCol] = source[row][col];
+                }
+            }
+        }
     }
 }
