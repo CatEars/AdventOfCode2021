@@ -41,9 +41,7 @@ namespace AdventOfCode2021.Solutions.Day16
 
             public int VersionCounter { get; set; } = 0;
 
-            public int Indent { get; set; } = 0;
-
-            public Stack<long> Stack { get; set; } = new();
+            public Stack<long> Stack { get; } = new();
         }
 
         public static long BitsToNum(IEnumerable<char> chars)
@@ -86,7 +84,6 @@ namespace AdventOfCode2021.Solutions.Day16
             var version = bitStream.TakeInt(3);
             bitStream.VersionCounter += (int) version;
             var typeId = bitStream.TakeInt(3);
-            bitStream.Indent += 1;
             if (typeId == 4)
             {
                 ParseLiteral(bitStream);
@@ -106,7 +103,6 @@ namespace AdventOfCode2021.Solutions.Day16
 
                 ParseOperator(bitStream, operatorFuncs[(int)typeId]);
             }
-            bitStream.Indent -= 1;
         }
 
         private void ParseAndApplyWhile(BitStream bitStream, Func<long, long, long> operatorFunc, Func<bool> shouldContinue)
