@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net;
 using AdventOfCode2021.Solutions.Interface;
 using AdventOfCode2021.Util;
 
@@ -102,7 +101,7 @@ namespace AdventOfCode2021.Solutions.Day16
                     { 3, Math.Max },
                     { 5, (a, b) => a > b ? 1 : 0 },
                     { 6, (a, b) => a < b ? 1 : 0 },
-                    { 7, (a, b) => a == b ? 1 : 0},
+                    { 7, (a, b) => a == b ? 1 : 0}
                 };
 
                 ParseOperator(bitStream, operatorFuncs[(int)typeId]);
@@ -110,40 +109,32 @@ namespace AdventOfCode2021.Solutions.Day16
             bitStream.Indent -= 1;
         }
 
+        private void ParseAndApplyWhile(BitStream bitStream, Func<long, long, long> operatorFunc, Func<bool> shouldContinue)
+        {
+            Parse(bitStream);
+            var first = bitStream.Stack.Pop();
+            while (shouldContinue())
+            {
+                Parse(bitStream);
+                first = operatorFunc(first, bitStream.Stack.Pop());
+            }
+            bitStream.Stack.Push(first);
+        }
+
         private void ParseOperator(BitStream bitStream, Func<long, long, long> operatorFunc)
         {
             var lengthTypeId = bitStream.TakeInt(1);
-
             if (lengthTypeId == 0)
             {
                 var numBitsForSubPackages = bitStream.TakeInt(15);
                 var expectedEnd = bitStream.ProgramCounter + numBitsForSubPackages;
-                bitStream.Indent += 1;
-                Parse(bitStream);
-                var first = bitStream.Stack.Pop();
-                while (bitStream.ProgramCounter < expectedEnd)
-                {
-                    Parse(bitStream);
-                    var second = bitStream.Stack.Pop();
-                    first = operatorFunc(first, second);
-                }
-                bitStream.Stack.Push(first);
-                bitStream.Indent -= 1;
+                ParseAndApplyWhile(bitStream, operatorFunc, () => bitStream.ProgramCounter < expectedEnd);
             }
             else
             {
                 var numSubPackages = bitStream.TakeInt(11);
-                bitStream.Indent += 1;
-                Parse(bitStream);
-                var first = bitStream.Stack.Pop();
-                for (var idx = 1; idx < numSubPackages; ++idx)
-                {
-                    Parse(bitStream);
-                    var second = bitStream.Stack.Pop();
-                    first = operatorFunc(first, second);
-                }
-                bitStream.Stack.Push(first);
-                bitStream.Indent -= 1;
+                var cnt = 0;
+                ParseAndApplyWhile(bitStream, operatorFunc, () => ++cnt < numSubPackages);
             }
         }
 
