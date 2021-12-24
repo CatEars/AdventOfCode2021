@@ -9,84 +9,51 @@ namespace AdventOfCode2021.Solutions.Day18
 {
     public class Day18Solver : ISolvable
     {
-
         private static string FileName => "Input/Day18_A.input";
 
-        private class Tree
+        private class TreeNode
         {
+            public int Value { get; set; } = -1;
+        }
 
-            public Tree? Lhs;
-            public Tree? Rhs;
-            public Tree? Parent;
-            public int LhsValue = -1;
-            public int RhsValue = -1;
-            public bool IsLeftChild = false;
-            public bool IsRightChild = false;
+        public void Run()
+        {
+            SolveFirstStar();
+            SolveSecondStar();
+        }
 
-            public bool HasLeftChild => Lhs != null || LhsValue != -1;
+        private static void SolveFirstStar()
+        {
+            var lines = FileRead.ReadLines(FileName);
+            var snailNumbers = lines.Select(ParseSnailNumber).ToList();
+            var result = snailNumbers.Aggregate((aggregator, current) =>
+                AddSnailNumber(aggregator, current).Pipe(ReduceSnailNumber));
+            Console.WriteLine("Solution (1): " + Magnitude(result));
+        }
 
-            public void AddNum(int symbol)
+        private static void SolveSecondStar()
+        {
+            var lines = FileRead.ReadLines(FileName);
+            var maxMagnitude = 0L;
+            for (var x = 0; x < lines.Count; x++)
             {
-                if (HasLeftChild)
+                for (var y = 0; y < lines.Count; ++y)
                 {
-                    RhsValue = symbol;
-                }
-                else
-                {
-                    LhsValue = symbol;
+                    if (y == x) continue;
+                    var lhs = ParseSnailNumber(lines[x]);
+                    var rhs = ParseSnailNumber(lines[y]);
+                    var magnitude = AddSnailNumber(lhs, rhs).Pipe(ReduceSnailNumber).Pipe(Magnitude);
+                    maxMagnitude = Math.Max(maxMagnitude, magnitude);
                 }
             }
 
-            public static Tree New(Tree? lhs, Tree? rhs, Tree? parent, int lhsValue, int rhsValue)
-            {
-                return new Tree
-                {
-                    Lhs = lhs,
-                    Rhs = rhs,
-                    Parent = parent,
-                    LhsValue = lhsValue,
-                    RhsValue = rhsValue
-                };
-            }
-
-            public void Print()
-            {
-                Console.Write("[");
-                if (Lhs == null)
-                {
-                    Console.Write(LhsValue);
-                }
-                else
-                {
-                    Lhs.Print();
-                }
-                Console.Write(",");
-                if (Rhs == null)
-                {
-                    Console.Write(RhsValue);
-                }
-                else
-                {
-                    Rhs.Print();
-                }
-                Console.Write("]");
-            }
+            Console.WriteLine("Solution (2): " + maxMagnitude);
         }
 
-        private static Tree Root()
+        private static BinaryTree<TreeNode> ParseSnailNumber(string line)
         {
-            return Tree.New(null, null, null, -1, -1);
-        }
-
-        private static Tree Child(Tree parent)
-        {
-            return Tree.New(null, null, parent, -1, -1);
-        }
-        
-        private static Tree ParseSnailNumber(string line)
-        {
-            var stack = new Stack<Tree>();
-            var root = Root();
+            var stack = new Stack<BinaryTree<TreeNode>>();
+            var root = BinaryTree<TreeNode>.Root();
             stack.Push(root);
             var idx = 1;
             while (idx < line.Length)
@@ -94,22 +61,14 @@ namespace AdventOfCode2021.Solutions.Day18
                 var symbol = line[idx];
                 if ('0' <= symbol && symbol <= '9')
                 {
-                    stack.Peek().AddNum(symbol - '0');
+                    var value = symbol - '0';
+                    var leaf = BinaryTree<TreeNode>.Child(stack.Peek());
+                    leaf.State.Value = value;
                 }
                 else if (symbol == '[')
                 {
                     var parent = stack.Peek();
-                    var child = Child(parent);
-                    if (parent.HasLeftChild)
-                    {
-                        parent.Rhs = child;
-                        child.IsRightChild = true;
-                    }
-                    else
-                    {
-                        parent.Lhs = child;
-                        child.IsLeftChild = true;
-                    }
+                    var child = BinaryTree<TreeNode>.Child(parent);
                     stack.Push(child);
                 }
                 else if (symbol == ']')
@@ -122,26 +81,16 @@ namespace AdventOfCode2021.Solutions.Day18
 
             return root;
         }
-        
-        public void Run()
+
+        private static BinaryTree<TreeNode> AddSnailNumber(BinaryTree<TreeNode> lhs, BinaryTree<TreeNode> rhs)
         {
-            SolveFirstStar();
-            SolveSecondStar();
+            var parent = BinaryTree<TreeNode>.Root();
+            parent.AddChild(lhs);
+            parent.AddChild(rhs);
+            return parent;
         }
 
-        private static Tree AddSnailNumber(Tree lhs, Tree rhs)
-        {
-            var newParent = Root();
-            newParent.Lhs = lhs;
-            lhs.IsLeftChild = true;
-            lhs.Parent = newParent;
-            newParent.Rhs = rhs;
-            rhs.IsRightChild = true;
-            rhs.Parent = newParent;
-            return newParent;
-        }
-
-        private static Tree ReduceSnailNumber(Tree root)
+        private static BinaryTree<TreeNode> ReduceSnailNumber(BinaryTree<TreeNode> root)
         {
             var explodable = FindExplodable(root);
             var splittable = FindSplittable(root);
@@ -163,215 +112,78 @@ namespace AdventOfCode2021.Solutions.Day18
             return root;
         }
 
-        private static void SplitSnailNumber(Tree splittable)
+        private static void SplitSnailNumber(BinaryTree<TreeNode> splittable)
         {
-            if (splittable.LhsValue >= 10)
+            var split = BinaryTree<TreeNode>.Root();
+            var left = BinaryTree<TreeNode>.Child(split);
+            var right = BinaryTree<TreeNode>.Child(split);
+            left.State.Value = splittable.State.Value >> 1;
+            right.State.Value = (splittable.State.Value >> 1) + (splittable.State.Value & 1);
+            split.Parent = splittable.Parent;
+
+            if (splittable.IsLeftChild)
             {
-                var split = Child(splittable);
-                split.LhsValue = splittable.LhsValue >> 1;
-                split.RhsValue = (splittable.LhsValue >> 1) + (splittable.LhsValue & 1);
-                split.IsLeftChild = true;
-                splittable.Lhs = split;
-                splittable.LhsValue = -1;
+                splittable.Parent!.Left = split;
             }
             else
             {
-                var split = Child(splittable);
-                split.LhsValue = splittable.RhsValue >> 1;
-                split.RhsValue = (splittable.RhsValue >> 1) + (splittable.RhsValue & 1);
-                split.IsRightChild = true;
-                splittable.Rhs = split;
-                splittable.RhsValue = -1;
+                splittable.Parent!.Right = split;
             }
         }
 
-        private static void ExplodeSnailNumber(Tree explodable)
+        private static void ExplodeSnailNumber(BinaryTree<TreeNode> explodable)
         {
-            var lhsBase = explodable.LhsValue;
-            var rhsBase = explodable.RhsValue;
-            
-            if (explodable.IsRightChild)
-            {
-                if (explodable.Parent.LhsValue != -1)
-                {
-                    explodable.Parent.LhsValue += lhsBase;
-                }
-                else
-                {
-                    var rightMost = FindRightmost(explodable.Parent.Lhs);
-                    rightMost.RhsValue += lhsBase;
-                }
+            var lhsBase = explodable.Left.State.Value;
+            var rhsBase = explodable.Right.State.Value;
 
-                var firstAvailable = explodable.Parent;
-                while (firstAvailable.IsRightChild) firstAvailable = firstAvailable.Parent;
-                firstAvailable = firstAvailable.Parent;
-                if (firstAvailable == null)
-                {
-                    // ignore
-                } 
-                else if (firstAvailable.RhsValue != -1)
-                {
-                    firstAvailable.RhsValue += rhsBase;
-                }
-                else
-                {
-                    var rightMost = FindLeftmost(firstAvailable.Rhs);
-                    rightMost.LhsValue += rhsBase;
-                }
-                explodable.Parent.RhsValue = 0;
-                explodable.Parent.Rhs = null;
-            }
-            else if (explodable.IsLeftChild)
+            // Go back up until we are no longer the "left child"
+            // Back up once, and select the left child
+            // In that branch, find the rightmost child
+            // Add our leftmost value to that node
+            var lefty = explodable;
+            while (lefty.IsLeftChild) lefty = lefty.Parent;
+            if (lefty.Parent != null)
             {
-                // Take rightmost and add to leftmost in parent chain
-                if (explodable.Parent.RhsValue != -1)
-                {
-                    explodable.Parent.RhsValue += rhsBase;
-                }
-                else
-                {
-                    var rightMost = FindLeftmost(explodable.Parent.Rhs);
-                    rightMost.LhsValue += rhsBase;
-                }
-
-                // Take leftmost and add to rightmost in parent chain
-                var firstAvailable = explodable.Parent;
-                while (firstAvailable.IsLeftChild) firstAvailable = firstAvailable.Parent;
-                firstAvailable = firstAvailable.Parent;
-                if (firstAvailable == null)
-                {
-                    // ignore, at root, no lefty
-                }
-                else if (firstAvailable.LhsValue != -1)
-                {
-                    firstAvailable.LhsValue += lhsBase;
-                }
-                else
-                {
-                    var rightMost = FindRightmost(firstAvailable.Lhs);
-                    rightMost.RhsValue += lhsBase;
-                }
-                explodable.Parent.LhsValue = 0;
-                explodable.Parent.Lhs = null;
+                lefty = lefty.Parent.Left;
+                lefty = lefty.Rightmost();
+                lefty.State.Value += lhsBase;
             }
+
+            var righty = explodable;
+            while (righty.IsRightChild) righty = righty.Parent;
+            if (righty.Parent != null)
+            {
+                righty = righty.Parent.Right;
+                righty = righty.Leftmost();
+                righty.State.Value += rhsBase;
+            }
+
+            // EXPLODE!
+            explodable.Left = null;
+            explodable.Right = null;
+            explodable.State.Value = 0;
         }
 
-        private static Tree FindLeftmost(Tree root)
+        private static BinaryTree<TreeNode>? FindSplittable(BinaryTree<TreeNode> root)
         {
-            if (root.Lhs != null) return FindLeftmost(root.Lhs);
-            return root;
+            return root.Find((node, _) => node.IsLeaf && node.State.Value >= 10, TreeSearchOrder.LeftToRight);
         }
 
-        private static Tree FindRightmost(Tree root)
+        private static BinaryTree<TreeNode>? FindExplodable(BinaryTree<TreeNode> root)
         {
-            if (root.Rhs != null) return FindRightmost(root.Rhs);
-            return root;
+            return root.Find((node, context) => !node.IsLeaf && context.Depth >= 4, TreeSearchOrder.LeftToRight);
         }
 
-        private static Tree? FindSplittable(Tree root)
+        private static int Magnitude(BinaryTree<TreeNode> root)
         {
-            if (root.LhsValue >= 10)
+            if (root.IsLeaf)
             {
-                return root;
-            }
-            if (root.Lhs != null)
-            {
-                var lhsSplit = FindSplittable(root.Lhs);
-                if (lhsSplit != null) return lhsSplit;
-            }
-
-            if (root.RhsValue >= 10)
-            {
-                return root;
-            }
-
-            if (root.Rhs != null)
-            {
-                var rhsSplit = FindSplittable(root.Rhs);
-                if (rhsSplit != null) return rhsSplit;
-            }
-
-            return null;
-        }
-
-        private static Tree? FindExplodable(Tree root, int depth = 0)
-        {
-            if (depth >= 4 && root.LhsValue >= 0)
-            {
-                if (root.RhsValue == -1)
-                {
-                    throw new ArgumentException("Tried to explode a non-balanced pair");
-                }
-                return root;
-            }
-            if (root.Lhs != null)
-            {
-                var leftExplode = FindExplodable(root.Lhs, depth + 1);
-                if (leftExplode != null) return leftExplode;
-            }
-
-            if (root.Rhs != null)
-            {
-                return FindExplodable(root.Rhs, depth + 1);
-            }
-
-            return null;
-        }
-
-        private static long Magnitude(Tree root)
-        {
-            long lhs = 0;
-            if (root.LhsValue >= 0)
-            {
-                lhs += root.LhsValue;
+                return root.State.Value;
             }
             else
             {
-                lhs += Magnitude(root.Lhs);
+                return 3 * Magnitude(root.Left) + 2 * Magnitude(root.Right);
             }
-
-            long rhs = 0;
-            if (root.RhsValue >= 0)
-            {
-                rhs += root.RhsValue;
-            }
-            else
-            {
-                rhs += Magnitude(root.Rhs);
-            }
-
-            return 3 * lhs + 2 * rhs;
         }
-        
-        private static void SolveFirstStar()
-        {
-            var lines = FileRead.ReadLines(FileName);
-            var snailNumbers = lines.Select(ParseSnailNumber).ToList();
-            var result = snailNumbers.Aggregate((aggregator, current) =>
-                AddSnailNumber(aggregator, current).Pipe(ReduceSnailNumber));
-            result.Print();
-            Console.WriteLine();
-            Console.WriteLine("Solution (1): " + Magnitude(result));
-        }
-
-        private static void SolveSecondStar()
-        {
-            var lines = FileRead.ReadLines(FileName);
-            var maxMagn = 0L;
-            for (var x = 0; x < lines.Count; x++)
-            {
-                for (var y = 0; y < lines.Count; ++y)
-                {
-                    if (y == x) continue;
-                    var a = ParseSnailNumber(lines[x]);
-                    var b = ParseSnailNumber(lines[y]);
-                    var mag = AddSnailNumber(a, b).Pipe(ReduceSnailNumber).Pipe(Magnitude);
-                    maxMagn = Math.Max(maxMagn, mag);
-                }
-            }
-
-            Console.WriteLine("Solution (2): " + maxMagn);
-        }
-
     }
 }
