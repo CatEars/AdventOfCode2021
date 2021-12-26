@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace AdventOfCode2021.Util
 {
@@ -11,5 +12,15 @@ namespace AdventOfCode2021.Util
             collection.Reverse();
         }
 
+        public static T End<T>(this List<T> collection)
+        {
+            if (collection.Count == 0)
+            {
+                throw new ArgumentException("Collection is empty");
+            }
+
+            return collection[collection.Count - 1];
+        }
+        
     }
 }
