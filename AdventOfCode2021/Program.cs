@@ -12,6 +12,8 @@ using AdventOfCode2021.Solutions.Day17;
 using AdventOfCode2021.Solutions.Day18;
 using AdventOfCode2021.Solutions.Day19;
 using AdventOfCode2021.Solutions.Day2;
+using AdventOfCode2021.Solutions.Day20;
+using AdventOfCode2021.Solutions.Day24;
 using AdventOfCode2021.Solutions.Day3;
 using AdventOfCode2021.Solutions.Day4;
 using AdventOfCode2021.Solutions.Day5;
@@ -46,7 +48,13 @@ namespace AdventOfCode2021
             new Day16Solver(),
             new Day17Solver(),
             new Day18Solver(),
-            new Day19Solver()
+            new Day19Solver(),
+            new Day20Solver(),
+            null,
+            null,
+            null,
+            new Day24Solver(),
+            null
         };
 
         private static void TimeAll()
@@ -72,7 +80,7 @@ namespace AdventOfCode2021
 
         static void Main(string[] args)
         {
-            var day = 19;
+            var day = 20;
             SolveFor(day);
             //TimeAll();
         }
