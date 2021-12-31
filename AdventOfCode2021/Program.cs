@@ -15,6 +15,7 @@ using AdventOfCode2021.Solutions.Day2;
 using AdventOfCode2021.Solutions.Day20;
 using AdventOfCode2021.Solutions.Day21;
 using AdventOfCode2021.Solutions.Day22;
+using AdventOfCode2021.Solutions.Day23;
 using AdventOfCode2021.Solutions.Day24;
 using AdventOfCode2021.Solutions.Day3;
 using AdventOfCode2021.Solutions.Day4;
@@ -54,7 +55,7 @@ namespace AdventOfCode2021
             new Day20Solver(),
             new Day21Solver(),
             new Day22Solver(),
-            null,
+            new Day23Solver(),
             new Day24Solver(),
             null
         };
@@ -82,7 +83,7 @@ namespace AdventOfCode2021
 
         static void Main(string[] args)
         {
-            var day = 22;
+            var day = 23;
             SolveFor(day);
             //TimeAll();
         }
