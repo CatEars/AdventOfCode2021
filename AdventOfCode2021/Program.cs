@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using AdventOfCode2021.Solutions.Day1;
 using AdventOfCode2021.Solutions.Day10;
 using AdventOfCode2021.Solutions.Day11;
@@ -63,15 +64,24 @@ namespace AdventOfCode2021
 
         private static void TimeAll()
         {
+            var timePerProblem = new List<(DateTime, DateTime)>();
             var start = DateTime.UtcNow;
             foreach (var sol in solutions)
             {
+                var a = DateTime.Now;
                 sol.Run();
+                var b = DateTime.Now;
                 Console.WriteLine(" ========= ");
+                timePerProblem.Add((a, b));
             }
             var end = DateTime.UtcNow;
             var diff = end - start;
             Console.WriteLine($"Total time for {solutions.Count} solutions was {diff}");
+            foreach (var idx in Enumerable.Range(0, timePerProblem.Count))
+            {
+                var x = timePerProblem[idx].Item2 - timePerProblem[idx].Item1;
+                Console.WriteLine($"{idx + 1} - Took {x} to solve");
+            }
         }
 
         private static void SolveFor(int day)
@@ -84,9 +94,9 @@ namespace AdventOfCode2021
 
         static void Main(string[] args)
         {
-            var day = 25;
-            SolveFor(day);
-            //TimeAll();
+            //var day = 25;
+            //SolveFor(day);
+            TimeAll();
         }
     }
 }

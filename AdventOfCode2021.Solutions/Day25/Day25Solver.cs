@@ -68,7 +68,7 @@ namespace AdventOfCode2021.Solutions.Day25
 
         private void SolveSecondStar()
         {
-            Console.WriteLine("Solution (2): " + 0);
+            Console.WriteLine("Solution (2): There is no solution 2 :)");
         }
     }
 }
